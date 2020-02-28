@@ -1,6 +1,6 @@
 const moment = require('moment');
 
-exports.displayProduct = function displayProduct(data, url) {
+exports.displayProduct = function displayProduct(data) {
     return {
         title: data.title,
         description: data.description,

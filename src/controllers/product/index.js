@@ -3,7 +3,6 @@ const { errorHandler } = require('../../../libs');
 const validator = require('../../validators/api');
 const Product = require('../../repositories/product');
 const Transformer = require('../../transformers/product');
-const moment = require('moment');
 
 app.post('/', validator.insertProduct, async (req, res) => {
   const { body } = req;
