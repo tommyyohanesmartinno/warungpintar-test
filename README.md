@@ -1,4 +1,4 @@
-﻿# price-tracker
+﻿# ralali-test
 
 ### Installing
 
