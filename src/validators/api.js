@@ -8,7 +8,7 @@ module.exports = {
         body: joi.object().keys({
           title: joi.string().required(),
           description: joi.string().required(),
-          rating: joi.string().required(),
+          rating: joi.integer().required(),
           image: joi.string().required(),
         }).required()
     }
