@@ -6,7 +6,10 @@ module.exports = {
   insertProduct: (req, res, next) => {
     const schema = {
         body: joi.object().keys({
-            url: joi.string().required(),
+          title: joi.string().required(),
+          description: joi.string().required(),
+          rating: joi.string().required(),
+          image: joi.string().required(),
         }).required()
     }
     validator.validate(req, res, next, schema);

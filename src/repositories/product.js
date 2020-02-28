@@ -1,5 +1,4 @@
 const { Repo } = require('./../../libs');
-const moment = require('moment');
 
 class Product extends Repo {
   constructor(option = {}) {
@@ -12,32 +11,22 @@ class Product extends Repo {
   async insert(values) {
     const product_id = await this.ctx(this.tableName).insert(
       { 
-        name: values.name,
-        url: values.url,
+        title: values.title,
         description: values.description,
-        price_regular: values.price_regular,
-        price_special: values.price_special,
+        rating: values.rating,
+        image: values.image,
       },
       ['id']
     );
-    values.picture.forEach(async item => {
-      await this.ctx('product_image').insert({
-        product_id,
-        image: item
-      });
-    });
-
     return {
       message: 'success',
       product_id
     };
   }
 
-  async getForUpdate() {
-    return this.ctx(this.tableName)
-      .whereRaw('HOUR(TIMEDIFF(NOW(), updated_at)) >= 1')
-      .select()
-      .orderBy('updated_at', 'ASC');
+
+  async deleteOne(where) {
+    return this.ctx(this.tableName).where(where).del();
   }
 }
 

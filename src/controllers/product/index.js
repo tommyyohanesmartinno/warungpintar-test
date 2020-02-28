@@ -1,19 +1,15 @@
 const app = require('express').Router();
 const { errorHandler } = require('../../../libs');
 const validator = require('../../validators/api');
-const scraper = require("./../../helper/scraper");
 const Product = require('../../repositories/product');
-const ProductImage = require('../../repositories/product_image');
-const ProductPrice = require('../../repositories/product_price');
-const transformers = require('../../transformers/product');
+const Transformer = require('../../transformers/product');
 const moment = require('moment');
 
 app.post('/', validator.insertProduct, async (req, res) => {
   const { body } = req;
   const product = new Product();
-  const productPrice = new ProductPrice();
 
-  const isExists = await product.findOne({ url: body.url });
+  const isExists = await product.findOne({ title: body.title });
   if(isExists) {
     errorHandler.badrequest(
       res,
@@ -22,19 +18,8 @@ app.post('/', validator.insertProduct, async (req, res) => {
     return;
   }
 
-  const scraping = await scraper([body.url]).catch(error => {
-    errorHandler.unhandler(res, error);
-    return;
-  });
-
   try {
-    const result = await product.insert(scraping[0]);
-    await productPrice.insert({
-      product_id: result.product_id[0],
-      price_regular: scraping[0].price_regular,
-      price_special: scraping[0].price_special
-    });
-
+    const result = await product.insert(body);
     res.send({
         message: 'insert success',
         product_id: result.product_id[0]
@@ -60,8 +45,6 @@ app.get('/detail/:id', async (req, res) => {
   const { params } = req;
 
   const product = new Product();
-  const productImage = new ProductImage();
-  const productPrice = new ProductPrice();
 
   const data = await product.findOne({ id: params.id });
   if(!data) {
@@ -73,55 +56,34 @@ app.get('/detail/:id', async (req, res) => {
   }
 
   try {
-    let price = await productPrice.findAll({ product_id: params.id });
-    const picture = await productImage.findAll({ product_id: params.id });
-    price = price.map(x => transformers.priceToChart(x, price.length));
-    dataChart = [
-      ["Time", "Regular Price", "Special Price"],
-    ];
-
     res.send({
       message: 'success',
-      product: data,
-      price: dataChart.concat(price),
-      picture
+      product: Transformer.displayProduct(data)
   });
   } catch (err) {
     errorHandler.unhandler(res, err);
   }
 });
 
-app.post('/update', async (req, res) => {
+app.delete('/delete/:id', async (req, res) => {
+  const { params } = req;
+
   const product = new Product();
-  const productPrice = new ProductPrice();
 
-  const products = await product.getForUpdate();
-  const urls = [...new Set(products.map((item) => item.url))];
-
-  const scraping = await scraper(urls).catch(error => {
-    errorHandler.unhandler(res, error);
+  const data = await product.findOne({ id: params.id });
+  if(!data) {
+    errorHandler.notFound(
+      res,
+      `Product didnt exist`
+    );
     return;
-  });
+  }
 
   try {
-    await Promise.all(scraping.map(async (item) => {
-      var picked = products.find(o => o.url === item.url);
-      await product.update(
-        {
-          price_regular: item.price_regular,
-          price_special: item.price_special,
-          updated_at: moment().utc().format('YYYY-MM-DD HH:mm:ss')
-        }, { id: picked.id});
-
-      await productPrice.insert({
-        product_id: picked.id,
-        price_regular: item.price_regular,
-        price_special: item.price_special
-      });
-    }));
+    await product.deleteOne({ id: params.id });
 
     res.send({
-        message: 'update success'
+        message: 'delete success'
     });
   } catch (err) {
     errorHandler.unhandler(res, err);
