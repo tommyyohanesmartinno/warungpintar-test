@@ -3,13 +3,10 @@ const joi = require('joi');
 const { validator } = require('./../../libs');
 
 module.exports = {
-  insertProduct: (req, res, next) => {
+  insert: (req, res, next) => {
     const schema = {
         body: joi.object().keys({
-          title: joi.string().required(),
-          description: joi.string().required(),
-          rating: joi.number().required(),
-          image: joi.string().required(),
+          content: joi.string().required()
         }).required()
     }
     validator.validate(req, res, next, schema);

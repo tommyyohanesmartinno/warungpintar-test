@@ -60,8 +60,6 @@ function setupController(app) {
         }
         app.use(`/${route}`, require(`./../../src/controllers/${m}`));
     });
-    // app.use('/user', require('./../../src/controllers/user/index'));
-    // app.use('/test', require('./../../src/controllers/test/index.js'));
 
     app.get(`${apiPrefix}/auth/route/list`, (req, res) => res.send(routes));
 }
