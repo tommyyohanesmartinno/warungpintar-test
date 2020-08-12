@@ -1,3 +1,4 @@
 const routing = require('./routing');
+const sockets = require('./sockets');
 
-module.exports = { routing };
+module.exports = { routing, sockets };

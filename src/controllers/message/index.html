@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Tracker Message</title>
+    <script src="http://localhost:3000/socket.io/socket.io.js"></script>
+    <script>
+        var socket = io('http://localhost:3000');
+        
+        socket.on('newMessage', data => {
+            const messageElement = document.createElement('div');
+            messageElement.innerText = data.id + '. ' + data.content;
+            document.getElementById('message-container').append(messageElement);
+        });
+    </script>
+    <style>
+        body {
+            padding: 0;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+        }
+
+        #message-container {
+            width: 80%;
+            max-width: 1200px;
+        }
+
+        #message-container div {
+            background-color: #CCC;
+            padding: 5px;
+        }
+
+        #message-container div:nth-child(2n) {
+            background-color: #FFF;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="message-container"></div>
+</body>
+
+</html>

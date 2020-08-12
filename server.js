@@ -1,12 +1,11 @@
 const http = require('http');
 const express = require('express');
-const socketIO = require('socket.io'); 
 const morgan = require('morgan');
 const bodyParser = require('body-parser');
 const cors = require('cors');
 const core = require('./libs');
 
-const { routing } = core.setup;
+const { routing, sockets } = core.setup;
 
 const app = express();
 
@@ -25,6 +24,7 @@ app.use(morgan('tiny'));
 routing(app);
 
 const server = http.createServer(app);
-let io = socketIO(server);
+const io = sockets.listen(server);
+app.set('io', io);
 
-module.exports = { app, server, io };
+module.exports = { app, server };

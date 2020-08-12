@@ -9,16 +9,16 @@ const onError = (error) => {
         : `Port ${port}`;
 
     switch (error.code) {
-    case 'EACCES':
+        case 'EACCES':
             console.error(`${bind} requires elevated privileges`); // eslint-disable-line
-        process.exit(1);
-        break;
-    case 'EADDRINUSE':
+            process.exit(1);
+            break;
+        case 'EADDRINUSE':
             console.error(`${bind} is already in use`); // eslint-disable-line
-        process.exit(1);
-        break;
-    default:
-        throw error;
+            process.exit(1);
+            break;
+        default:
+            throw error;
     }
 };
 

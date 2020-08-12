@@ -4,19 +4,23 @@ const validator = require('../../validators/message');
 const Message = require('../../repositories/message');
 const Transformer = require('../../transformers/message');
 
-app.post('/', validator.insert, async (req, res) => {
+app.get('/', (req, res) => {
+  res.sendFile(__dirname + '/index.html');
+});
+
+app.post('/send', validator.insert, async (req, res) => {
   const { body } = req;
   const message = new Message();
   try {
     const result = await message.insert(body);
+    const data = Transformer.displayMessage(result);
 
-    // io.on('connection', (socket) => { 
-    //    socket.emit('newMessage', Transformer.displayMessage(result)); 
-    // });
+    var io = req.app.get('io');
+    io.emit('newMessage', data); 
 
     res.send({
       message: 'Success',
-      data: Transformer.displayMessage(result)
+      data
     });
   } catch (err) {
     errorHandler.unhandler(res, err);
